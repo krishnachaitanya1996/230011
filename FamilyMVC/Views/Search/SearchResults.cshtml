@@ -1,0 +1,91 @@
+﻿
+@using PagedList;
+@using PagedList.Mvc;
+@model IPagedList<FamilyMVC.Models.ResultSet>
+<p>
+    Search Results
+</p>
+<table id="myTable" class="table tablesorter">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.First().FirstName)
+            </th>
+            @*<th>
+                    @Html.DisplayNameFor(model => model.First().MiddleName)
+                </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.First().LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Suffix)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().DateOfBirth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().ApplicationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().isApproved)
+            </th>
+            <th class="sorter-false">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.MiddleName)
+                    </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Suffix)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateOfBirth)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    
+                    @Html.DisplayFor(modelItem => item.ApplicationId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.isApproved)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { data = item.MemberId }) |
+                    @Html.ActionLink("View", "View", new { data = item.MemberId })
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+
+@*@Html.PagedListPager(Model,page => Url.Action("SearchApplication",new Page { Page = page }))*@
+
+<div id="container" style="margin-left: 20px">
+    <p></p>
+    <p></p>
+    <div class="pagination" style="margin-left: 400px">
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)
+        of @Model.PageCount   @Html.PagedListPager(Model, page => Url.Action("res", new { page }))
+    </div>
+</div>
+
+

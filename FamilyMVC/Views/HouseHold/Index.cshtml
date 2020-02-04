@@ -1,0 +1,235 @@
+﻿@model IEnumerable<FamilyMVC.Models.HouseHoldMemberDetails>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+@if (ViewBag.MessageForRelations == null)
+{
+<div class="card container">
+    <ul class="nav nav-tabs">
+        @* <div style="display:flex">*@
+        @foreach (var item in Model)
+        {
+            <li>
+                <a data-toggle="tab" id="mytabs" name="#@item.MemberId">
+                    @if (item.Gender.ToLower() == "male")
+                    {
+                        <img src="~/Images2/male.png" width="100" height="100" alt="Male Img" />
+                    }
+                    else
+                    {
+                        <img src="~/Images2/female.png"  width="100" height="100" alt="Female Img" />
+                    }
+                </a>
+                <div class="card-block">                    
+                    <p class="card-text">
+                        @item.FirstName
+                    </p>
+                </div>
+            </li>
+        }
+    </ul>
+    <div>
+        <div class="tab-content">
+            @foreach (var data in Model)
+            {
+                <div id="@data.MemberId" class="tab-pane fade">
+                    <p id="@data.FirstName">@data.FirstName 's Relationships</p>
+                    @foreach (var data1 in Model)
+                    {
+                        <div id="@data1.FirstName">
+                            @if (data.FirstName != data1.FirstName)
+                            {
+                                <p>
+                                    @{
+                                        var name = @data.FirstName + "_relationto_" + data1.FirstName;
+                                        var gender = data.Gender;
+                                    }
+                                    Relation to @data1.FirstName <span style="color:red"> *</span>
+                                    @Html.DropDownList("relation", new List<SelectListItem>() { new SelectListItem { Text = "Mother"},
+                                     new SelectListItem { Text = "Father"},
+                                     new SelectListItem { Text = "Son"},
+                                     new SelectListItem { Text = "Daughter"}
+                                     }, "Select Relation", new { @class = "btn btn-default dropdowns", @id = name, @datas = gender, @required = true })
+                                </p>
+                                        }
+                        </div>
+                                        }
+                </div>
+                                        }
+        </div>
+    </div>
+</div>
+<br />
+<br />
+  }
+<div>
+    @if (ViewBag.MessageForRelations == null)
+    {
+    <input type="button" value="Save & Exit" id="save_exit" class="btn btn-default btn-success" />
+    }
+    else
+    {
+    <div>All the Relations are submitted earlier. Click on Submit to download pdf</div>
+    }
+    <div style="float:right">
+        <a href="/Home/CreateApplication"><input type="button" value="Back" class="btn btn-default btn-success" /></a>
+        <input type="button" value="Submit" id="submit" class="btn btn-default btn-success" />
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".tab-content div:first").addClass("active in");
+
+        $(".dropdowns").change(function () {
+            var ddid = this.id;
+            console.log($("#" + ddid)["0"].attributes[1].nodeValue);
+            var retainedId = ddid.split("_relationto_")[1] + "_relationto_" + ddid.split("_relationto_")[0];
+            if (this.value == "Mother") {
+                console.log(this);
+                if ($("#" + retainedId)["0"].attributes[1].nodeValue == "Male")
+                    $("#" + retainedId).val("Son");
+                else
+                    $("#" + retainedId).val("Daughter");
+            }
+            else if (this.value == "Father") {
+                if ($("#" + retainedId)["0"].attributes[1].nodeValue == "Male")
+                    $("#" + retainedId).val("Son");
+                else
+                    $("#" + retainedId).val("Daughter");
+
+            }
+            else if (this.value == "Son") {
+                console.log(ddid);
+                if ($("#" + retainedId)["0"].attributes[1].nodeValue == "Male")
+                    $("#" + retainedId).val("Father");
+                else
+                    $("#" + retainedId).val("Mother");
+            }
+            else if (this.value == "Daughter") {
+                console.log(ddid);
+                if ($("#" + retainedId)["0"].attributes[1].nodeValue == "Male")
+                    $("#" + retainedId).val("Father");
+                else
+                    $("#" + retainedId).val("Mother");
+            }
+            $("#" + retainedId).prop("disabled", true);
+        })
+
+        $("#save_exit").click(function () {
+            var details = {};
+            var error = 0;
+            console.log($('select[name=relation]'));
+            var dds = $('select[name=relation]');
+            $.each(dds, function (index, value) {
+                if (value.value != '') {
+                    details[value.id] = value.value;
+                }
+                else {
+                    error = 1;
+                }
+            })
+            if (error == 0) {
+                var jsondata = JSON.stringify({ 'jsondata': details });
+                $.ajax({
+                    url: '/HouseHold/SaveAndExit',
+                    type: 'post',
+                    //data: { details: $('select[name=relation]').toString() },
+                    data: jsondata,
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        console.log("data stored");
+                        window.location.replace("/Search/SearchApplication");
+                    },
+                    error: function () {
+                        alert("Error occured!");
+                    }
+                });
+            }
+            else {
+                alert("Please select all relations..");
+            }
+
+        })
+
+        var ddsToSet = $('select[name=relation]');
+        $.each(ddsToSet, function (index, value) {           
+            $.ajax({
+                url: '/HouseHold/GetddValue',
+                type: 'get',
+                data: { id: value.id },
+                dataType: 'json',
+                success: function (data) {
+                    //console.log("data stored");
+                    $("#" + value.id).val(data);
+                }
+            });
+        });
+
+        $("#submit").click(function () {
+            var details = {};
+            var error = 0;
+            var dds = $('select[name=relation]');
+            $.each(dds, function (index, value) {
+                console.log(value.value);
+                if (value.value != '') {
+                    details[value.id] = value.value;
+                }
+                else {
+                    debugger;
+                    error = 1;
+                }
+            })
+            if (error == 0) {
+                debugger;
+                details["FamilyId"] =  @Model.First().FamilyId;
+                var jsondata = JSON.stringify({ 'jsondata': details });
+                $.ajax({
+                    url: '/HouseHold/SubmitRelations',
+                    type: 'post',
+                    data: jsondata,
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        console.log(data);
+                        window.location.replace("/HouseHold/Confirmation?AppId=" + data + "&FamilyId=" + @Model.First().FamilyId);
+                    },
+                    error: function () {
+                        alert("Error occured!");
+                    }
+                });
+            }
+            else {
+                alert("Please select all relations..")
+            }
+        });
+        $("a").click(function () {
+            console.log("clicked");
+            var ToGetVisible = this.attributes["name"].nodeValue;
+            var error = 0;
+            var visibleId = $("div.active in");
+            console.log(visibleId.prop("class"));
+            $("select:visible").each(function (index, value) {
+                console.log(index);
+                console.log(value.value);
+                if (value.value == '')
+                    error = 1;
+                
+            });
+
+            console.log(error);
+            if (error == 0) {
+                $(".active").removeClass('active in');
+                $(ToGetVisible).addClass("active in");
+            }
+            else {
+                alert("please select all relations to go to next tab")
+            }
+        });
+    });
+</script>

@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<br />
+
+<br />
+<div>
+    <div style="text-align:center">
+        <a href="/Home/CreateApplication">
+            <input type="button" value="Create Application" class="btn btn-default btn-success" />
+        </a>
+    </div>
+    <br />
+    <br />
+    <div style="text-align:center">
+        @if (Session["UserType"].ToString() == "Admin")
+        {
+            <a href="/Search/SearchApplication">
+                <input type="button" value="Search Application" id="submit" class="btn btn-default btn-success" />
+            </a>
+        }
+    </div>
+</div>

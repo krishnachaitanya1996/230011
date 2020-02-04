@@ -1,0 +1,150 @@
+﻿@model FamilyMVC.Models.HouseHoldMemberDetails
+
+@{
+    ViewBag.Title = "CreateApplication";
+}
+
+<h2>CreateApplication</h2>
+
+<h12 style="color:red">*-Required field</h12>
+
+<h3 style="color:red">@ViewBag.CountError</h3>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "formdata" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>HouseHoldMemberDetails</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MiddleName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MiddleName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MiddleName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Suffix, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model=>model.Suffix,new List<SelectListItem> { new SelectListItem { Text= "Mr."},
+               new SelectListItem { Text = "Ms."}
+           }, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Suffix, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DateOfBirth, new { htmlAttributes = new { @class = "form-control datepicker" } })               
+                @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Gender, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+
+                @Html.RadioButtonFor(m => m.Gender, "Male", new { htmlAttributes = new { @class = "form-control" } })
+                @Html.Label("Male")
+
+                @Html.RadioButtonFor(m => m.Gender, "Female", new { htmlAttributes = new { @class = "form-control", @checked = "checked" } })
+                @Html.Label("Female")
+
+                @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div>
+            <input type="submit" value="Save&Exit" name ="submit" class="btn btn-default btn-success" />
+            <div style="float:right">
+                <input type="button" value="Back" id="back" class="btn btn-default btn-success" />
+                <a href="/HouseHold/Index"><input type="button" value="Next" id="submit" class="btn btn-default btn-success" /></a>
+            </div>
+        </div>
+
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="AddMember" name ="submit" class="btn btn-default btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+
+<div>
+    @Html.ActionLink("Back", "Index", "Home")
+</div>
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script type="text/javascript">
+    $('input[type=text]').each(function () {
+        var req = $(this).attr('data-val-required');
+        if (undefined != req) {
+            var label = $('label[for="' + $(this).attr('id') + '"]');
+            var text = label.text();
+            if (text.length > 0) {
+                label.append('<span style="color:red"> *</span>');
+            }
+        }
+    });
+    $('input[type=radio]').each(function () {
+        var req = $(this).attr('data-val-required');
+        if (undefined != req) {
+            var label = $('label[for="' + $(this).attr('id') + '"]');
+            var text = label.text();
+            if (text.length > 0) {
+                label.append('<span style="color:red"> *</span>');
+            }
+        }
+    });   
+    $(document).ready(function () {
+        //$('input[type=datetime]').datepicker({
+        //    dateFormat: "MM/dd/yyyy",
+        //    changeMonth: true,
+        //    changeYear: true,
+        //    yearRange: "-60:+0"
+        //});
+        $("#back").click(function () {
+            window.location.replace("/Home/Index");
+        })
+
+        $("#save_exit").click(function () {
+            $.ajax({
+                url: '/Home/SaveExit',
+                type: 'post',
+                data:  $("#formdata").serialize(),   
+                success: function (data) {
+                    console.log(data);
+                    //window.location.replace("HouseHold/Confirmation?AppId="+data+"&FamilyId=");
+                },
+                error: function () {
+                    alert("Error occured!");
+                }
+            });
+        });
+        });
+   
+</script>
